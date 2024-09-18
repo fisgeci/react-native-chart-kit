@@ -255,13 +255,13 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
   };
 
   renderDots = ({
-                  data,
-                  width,
-                  height,
-                  paddingTop,
-                  paddingRight,
-                  onDataPointClick
-                }: Pick<
+    data,
+    width,
+    height,
+    paddingTop,
+    paddingRight,
+    onDataPointClick
+  }: Pick<
     AbstractChartConfig,
     "data" | "width" | "height" | "paddingRight" | "paddingTop"
   > & {
@@ -339,22 +339,22 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
   };
 
   renderScrollableDot = ({
-                           data,
-                           width,
-                           height,
-                           paddingTop,
-                           paddingRight,
-                           scrollableDotHorizontalOffset,
-                           scrollableDotFill,
-                           scrollableDotStrokeColor,
-                           scrollableDotStrokeWidth,
-                           scrollableDotRadius,
-                           scrollableInfoViewStyle,
-                           scrollableInfoTextStyle,
-                           scrollableInfoTextDecorator = x => `${x}`,
-                           scrollableInfoSize,
-                           scrollableInfoOffset
-                         }: AbstractChartConfig & {
+    data,
+    width,
+    height,
+    paddingTop,
+    paddingRight,
+    scrollableDotHorizontalOffset,
+    scrollableDotFill,
+    scrollableDotStrokeColor,
+    scrollableDotStrokeWidth,
+    scrollableDotRadius,
+    scrollableInfoViewStyle,
+    scrollableInfoTextStyle,
+    scrollableInfoTextDecorator = x => `${x}`,
+    scrollableInfoSize,
+    scrollableInfoOffset
+  }: AbstractChartConfig & {
     onDataPointClick: LineChartProps["onDataPointClick"];
     scrollableDotHorizontalOffset: Animated.Value;
   }) => {
@@ -370,8 +370,8 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
     }
     let lastIndex: number;
 
-    const setLabelTextByValue = (value) => {
-      const index = value.value / perData;
+    const setLabelTextByValue = value => {
+      const index = value / perData;
       if (!lastIndex) {
         lastIndex = index;
       }
@@ -383,7 +383,6 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
       if (index >= data[0].data.length - 1) {
         this.label.current.setNativeProps({
           text: scrollableInfoTextDecorator(data[0].data[0])
-
         });
       } else {
         if (index > lastIndex) {
@@ -394,16 +393,12 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
           if (prev > base) {
             let rest = prev - base;
             this.label.current.setNativeProps({
-              text: scrollableInfoTextDecorator(
-                base + percent * rest
-              )
+              text: scrollableInfoTextDecorator(base + percent * rest)
             });
           } else {
             let rest = base - prev;
             this.label.current.setNativeProps({
-              text: scrollableInfoTextDecorator(
-                base - percent * rest
-              )
+              text: scrollableInfoTextDecorator(base - percent * rest)
             });
           }
         } else {
@@ -415,22 +410,18 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
           if (next > base) {
             let rest = next - base;
             this.label.current.setNativeProps({
-              text: scrollableInfoTextDecorator(
-                base + percent * rest
-              )
+              text: scrollableInfoTextDecorator(base + percent * rest)
             });
           } else {
             let rest = base - next;
             this.label.current.setNativeProps({
-              text: scrollableInfoTextDecorator(
-                base - percent * rest
-              )
+              text: scrollableInfoTextDecorator(base - percent * rest)
             });
           }
         }
       }
       lastIndex = index;
-    }
+    };
 
     data.forEach(dataset => {
       if (dataset.withScrollableDot == false) return;
@@ -447,19 +438,19 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
         values.push(index * perData);
         const yval =
           ((baseHeight -
-              this.calcHeight(
-                dataset.data[dataset.data.length - index - 1],
-                datas,
-                height
-              )) /
+            this.calcHeight(
+              dataset.data[dataset.data.length - index - 1],
+              datas,
+              height
+            )) /
             4) *
-          3 +
+            3 +
           paddingTop;
         yValues.push(yval);
         const xval =
           paddingRight +
           ((dataset.data.length - index - 1) * (width - paddingRight)) /
-          dataset.data.length;
+            dataset.data.length;
         xValues.push(xval);
 
         yValuesLabel.push(
@@ -492,7 +483,6 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
         extrapolate: "clamp"
       });
 
-
       output.push([
         <Animated.View
           key={Math.random()}
@@ -510,13 +500,13 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
         >
           <TextInput
             onLayout={() => {
-              scrollableDotHorizontalOffset.stopAnimation((value => {
+              scrollableDotHorizontalOffset.stopAnimation(value => {
                 setLabelTextByValue(value);
                 scrollableDotHorizontalOffset.removeAllListeners();
-              }));
+              });
 
               scrollableDotHorizontalOffset.addListener(value => {
-                setLabelTextByValue(value);
+                setLabelTextByValue(value.value);
               });
             }}
             style={scrollableInfoTextStyle}
@@ -539,13 +529,13 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
   };
 
   renderShadow = ({
-                    width,
-                    height,
-                    paddingRight,
-                    paddingTop,
-                    data,
-                    useColorFromDataset
-                  }: Pick<
+    width,
+    height,
+    paddingRight,
+    paddingTop,
+    data,
+    useColorFromDataset
+  }: Pick<
     AbstractChartConfig,
     "data" | "width" | "height" | "paddingRight" | "paddingTop"
   > & {
@@ -584,9 +574,9 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
               })
               .join(" ") +
             ` ${paddingRight +
-            ((width - paddingRight) / dataset.data.length) *
-            (dataset.data.length - 1)},${(height / 4) * 3 +
-            paddingTop} ${paddingRight},${(height / 4) * 3 + paddingTop}`
+              ((width - paddingRight) / dataset.data.length) *
+                (dataset.data.length - 1)},${(height / 4) * 3 +
+              paddingTop} ${paddingRight},${(height / 4) * 3 + paddingTop}`
           }
           fill={`url(#fillShadowGradientFrom${
             useColorFromDataset ? `_${index}` : ""
@@ -598,13 +588,13 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
   };
 
   renderLine = ({
-                  width,
-                  height,
-                  paddingRight,
-                  paddingTop,
-                  data,
-                  linejoinType
-                }: Pick<
+    width,
+    height,
+    paddingRight,
+    paddingTop,
+    data,
+    linejoinType
+  }: Pick<
     AbstractChartConfig,
     "data" | "width" | "height" | "paddingRight" | "paddingTop" | "linejoinType"
   >) => {
@@ -707,12 +697,12 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
   };
 
   renderBezierLine = ({
-                        data,
-                        width,
-                        height,
-                        paddingRight,
-                        paddingTop
-                      }: Pick<
+    data,
+    width,
+    height,
+    paddingRight,
+    paddingTop
+  }: Pick<
     AbstractChartConfig,
     "data" | "width" | "height" | "paddingRight" | "paddingTop"
   >) => {
@@ -740,13 +730,13 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
   };
 
   renderBezierShadow = ({
-                          width,
-                          height,
-                          paddingRight,
-                          paddingTop,
-                          data,
-                          useColorFromDataset
-                        }: Pick<
+    width,
+    height,
+    paddingRight,
+    paddingTop,
+    data,
+    useColorFromDataset
+  }: Pick<
     AbstractChartConfig,
     "data" | "width" | "height" | "paddingRight" | "paddingTop"
   > & {
@@ -763,9 +753,9 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
           data
         }) +
         ` L${paddingRight +
-        ((width - paddingRight) / xMax) *
-        (dataset.data.length - 1)},${(height / 4) * 3 +
-        paddingTop} L${paddingRight},${(height / 4) * 3 + paddingTop} Z`;
+          ((width - paddingRight) / xMax) *
+            (dataset.data.length - 1)},${(height / 4) * 3 +
+          paddingTop} L${paddingRight},${(height / 4) * 3 + paddingTop} Z`;
 
       return (
         <Path
@@ -876,18 +866,18 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
               {withHorizontalLines &&
                 (withInnerLines
                   ? this.renderHorizontalLines({
-                    ...config,
-                    count: count,
-                    paddingTop,
-                    paddingRight
-                  })
+                      ...config,
+                      count: count,
+                      paddingTop,
+                      paddingRight
+                    })
                   : withOuterLines
-                    ? this.renderHorizontalLine({
+                  ? this.renderHorizontalLine({
                       ...config,
                       paddingTop,
                       paddingRight
                     })
-                    : null)}
+                  : null)}
             </G>
             <G>
               {withHorizontalLabels &&
@@ -905,18 +895,18 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
               {withVerticalLines &&
                 (withInnerLines
                   ? this.renderVerticalLines({
-                    ...config,
-                    data: data.datasets[0].data,
-                    paddingTop: paddingTop as number,
-                    paddingRight: paddingRight as number
-                  })
+                      ...config,
+                      data: data.datasets[0].data,
+                      paddingTop: paddingTop as number,
+                      paddingRight: paddingRight as number
+                    })
                   : withOuterLines
-                    ? this.renderVerticalLine({
+                  ? this.renderVerticalLine({
                       ...config,
                       paddingTop: paddingTop as number,
                       paddingRight: paddingRight as number
                     })
-                    : null)}
+                  : null)}
             </G>
             <G>
               {withVerticalLabels &&
@@ -986,13 +976,15 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
             contentContainerStyle={{ width: width * 2 }}
             showsHorizontalScrollIndicator={false}
             scrollEventThrottle={16}
-            onScroll={Animated.event([
+            onScroll={Animated.event(
+              [
                 {
                   nativeEvent: {
                     contentOffset: { x: scrollableDotHorizontalOffset }
                   }
                 }
-              ], { useNativeDriver: false }
+              ],
+              { useNativeDriver: false }
             )}
             horizontal
             bounces={false}
