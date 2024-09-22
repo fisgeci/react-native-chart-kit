@@ -254,6 +254,8 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
     return { r: "4", ...propsForDots };
   };
 
+  numberOfVisibleDots = 0;
+
   renderDots = ({
     data,
     width,
@@ -279,6 +281,8 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
       }
     } = this.props;
     const xMax = this.getXMaxValues(data);
+    this.numberOfVisibleDots = 0;
+
     data.forEach(dataset => {
       if (dataset.withDots == false) return;
 
@@ -307,6 +311,8 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
             getColor: opacity => this.getColor(dataset, opacity)
           });
         };
+
+        this.numberOfVisibleDots++;
 
         output.push(
           <Circle
@@ -377,50 +383,15 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
       }
 
       let abs = Math.floor(index);
-      let percent = index - abs;
-      abs = data[0].data.length - abs - 1;
+      let trueIndex = data[0].data.length - 1 - abs;
 
-      if (index >= data[0].data.length - 1) {
-        this.label.current.setNativeProps({
-          text: scrollableInfoTextDecorator(data[0].data[0])
-        });
-      } else {
-        if (index > lastIndex) {
-          // to right
-
-          const base = data[0].data[abs];
-          const prev = data[0].data[abs - 1];
-          if (prev > base) {
-            let rest = prev - base;
-            this.label.current.setNativeProps({
-              text: scrollableInfoTextDecorator(base + percent * rest)
-            });
-          } else {
-            let rest = base - prev;
-            this.label.current.setNativeProps({
-              text: scrollableInfoTextDecorator(base - percent * rest)
-            });
-          }
-        } else {
-          // to left
-
-          const base = data[0].data[abs - 1];
-          const next = data[0].data[abs];
-          percent = 1 - percent;
-          if (next > base) {
-            let rest = next - base;
-            this.label.current.setNativeProps({
-              text: scrollableInfoTextDecorator(base + percent * rest)
-            });
-          } else {
-            let rest = base - next;
-            this.label.current.setNativeProps({
-              text: scrollableInfoTextDecorator(base - percent * rest)
-            });
-          }
-        }
+      if (trueIndex <= 0) {
+        trueIndex = 0;
       }
-      lastIndex = index;
+
+      this.label.current.setNativeProps({
+        text: scrollableInfoTextDecorator(data[0].data[trueIndex])
+      });
     };
 
     data.forEach(dataset => {
@@ -824,6 +795,15 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
       paddingBottom = 0
     } = style;
 
+    const scrollAnimatedEvent = event => {
+      const perData = width / this.numberOfVisibleDots;
+      const xOffset = event.nativeEvent.contentOffset.x;
+
+      const absIndex = Math.floor(xOffset / perData);
+
+      scrollableDotHorizontalOffset.setValue(perData * absIndex);
+    };
+
     const config = {
       width,
       height,
@@ -976,16 +956,7 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
             contentContainerStyle={{ width: width * 2 }}
             showsHorizontalScrollIndicator={false}
             scrollEventThrottle={16}
-            onScroll={Animated.event(
-              [
-                {
-                  nativeEvent: {
-                    contentOffset: { x: scrollableDotHorizontalOffset }
-                  }
-                }
-              ],
-              { useNativeDriver: false }
-            )}
+            onScroll={scrollAnimatedEvent}
             horizontal
             bounces={false}
           />
