@@ -273,6 +273,10 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
     const datas = this.getDatas(data);
     const baseHeight = this.calcBaseHeight(datas, height);
 
+    if (datas.length == 0) {
+      return;
+    }
+
     const {
       getDotColor,
       hidePointsAtIndex = [],
@@ -280,6 +284,7 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
         return null;
       }
     } = this.props;
+
     const xMax = this.getXMaxValues(data);
     this.numberOfVisibleDots = 0;
 
@@ -370,6 +375,10 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
 
     let vl: number[] = [];
 
+    if (datas.length == 0) {
+      return;
+    }
+
     const perData = width / data[0].data.length;
     for (let index = 0; index < data[0].data.length; index++) {
       vl.push(index * perData);
@@ -396,6 +405,10 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
 
     data.forEach(dataset => {
       if (dataset.withScrollableDot == false) return;
+
+      if (dataset || dataset.data || dataset.data.length < 2) {
+        return;
+      }
 
       const perData = width / dataset.data.length;
       let values = [];
@@ -644,12 +657,15 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
       Math.floor(paddingRight + (i * (width - paddingRight)) / xMax);
 
     const baseHeight = this.calcBaseHeight(datas, height);
-
     const y = (i: number) => {
       const yHeight = this.calcHeight(dataset.data[i], datas, height);
 
       return Math.floor(((baseHeight - yHeight) / 4) * 3 + paddingTop);
     };
+
+    if (!x(0) || !y(0)) {
+      return;
+    }
 
     return [`M${x(0)},${y(0)}`]
       .concat(
@@ -686,6 +702,10 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
         data
       });
 
+      if (!result) {
+        return;
+      }
+
       return (
         <Path
           key={index}
@@ -713,32 +733,40 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
   > & {
     useColorFromDataset: AbstractChartConfig["useShadowColorFromDataset"];
   }) =>
-    data.map((dataset, index) => {
-      const xMax = this.getXMaxValues(data);
-      const d =
-        this.getBezierLinePoints(dataset, {
+    data
+      .filter(dataset => dataset && dataset.data && dataset.data.length > 0)
+      .map((dataset, index) => {
+        const xMax = this.getXMaxValues(data);
+        const result = this.getBezierLinePoints(dataset, {
           width,
           height,
           paddingRight,
           paddingTop,
           data
-        }) +
-        ` L${paddingRight +
-          ((width - paddingRight) / xMax) *
-            (dataset.data.length - 1)},${(height / 4) * 3 +
-          paddingTop} L${paddingRight},${(height / 4) * 3 + paddingTop} Z`;
+        });
 
-      return (
-        <Path
-          key={index}
-          d={d}
-          fill={`url(#fillShadowGradientFrom${
-            useColorFromDataset ? `_${index}` : ""
-          })`}
-          strokeWidth={0}
-        />
-      );
-    });
+        if (!result) {
+          return;
+        }
+
+        const d =
+          result +
+          ` L${paddingRight +
+            ((width - paddingRight) / xMax) *
+              (dataset.data.length - 1)},${(height / 4) * 3 +
+            paddingTop} L${paddingRight},${(height / 4) * 3 + paddingTop} Z`;
+
+        return (
+          <Path
+            key={index}
+            d={d}
+            fill={`url(#fillShadowGradientFrom${
+              useColorFromDataset ? `_${index}` : ""
+            })`}
+            strokeWidth={0}
+          />
+        );
+      });
 
   renderLegend = (width, legendOffset) => {
     const { legend, datasets } = this.props.data;

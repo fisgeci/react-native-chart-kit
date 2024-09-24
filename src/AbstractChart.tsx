@@ -203,18 +203,19 @@ class AbstractChart<
     } = this.props;
     return new Array(count === 1 ? 1 : count + 1).fill(1).map((_, i) => {
       let yLabel = String(i * count);
-
-      if (count === 1) {
-        yLabel = `${yAxisLabel}${formatYLabel(
-          decimalPlaces ? data[0].toFixed(decimalPlaces) : data[0] + ""
-        )}${yAxisSuffix}`;
-      } else {
-        const label = this.props.fromZero
-          ? (this.calcScaler(data) / count) * i + Math.min(...data, 0)
-          : (this.calcScaler(data) / count) * i + Math.min(...data);
-        yLabel = `${yAxisLabel}${formatYLabel(
-          decimalPlaces ? label.toFixed(decimalPlaces) : label + ""
-        )}${yAxisSuffix}`;
+      if (data && data.length > 0) {
+        if (count === 1) {
+          yLabel = `${yAxisLabel}${formatYLabel(
+            decimalPlaces ? data[0].toFixed(decimalPlaces) : data[0] + ""
+          )}${yAxisSuffix}`;
+        } else {
+          const label = this.props.fromZero
+            ? (this.calcScaler(data) / count) * i + Math.min(...data, 0)
+            : (this.calcScaler(data) / count) * i + Math.min(...data);
+          yLabel = `${yAxisLabel}${formatYLabel(
+            decimalPlaces ? label.toFixed(decimalPlaces) : label + ""
+          )}${yAxisSuffix}`;
+        }
       }
 
       const basePosition = height * verticalLabelsHeightPercentage;
