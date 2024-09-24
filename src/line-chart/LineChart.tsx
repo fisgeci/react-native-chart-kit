@@ -406,7 +406,7 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
     data.forEach(dataset => {
       if (dataset.withScrollableDot == false) return;
 
-      if (dataset || dataset.data || dataset.data.length < 2) {
+      if (!dataset || !dataset.data || dataset.data.length < 2) {
         return;
       }
 
