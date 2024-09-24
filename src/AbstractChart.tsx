@@ -44,7 +44,9 @@ class AbstractChart<
 > extends Component<AbstractChartProps & IProps, AbstractChartState & IState> {
   calcScaler = (data: number[]) => {
     if (this.props.fromZero && this.props.fromNumber) {
-      return Math.max(...data, this.props.fromNumber) - Math.min(...data, 0) || 1;
+      return (
+        Math.max(...data, this.props.fromNumber) - Math.min(...data, 0) || 1
+      );
     } else if (this.props.fromZero) {
       return Math.max(...data, 0) - Math.min(...data, 0) || 1;
     } else if (this.props.fromNumber) {
@@ -189,7 +191,7 @@ class AbstractChart<
       paddingTop,
       paddingRight,
       horizontalLabelRotation = 0,
-      decimalPlaces = 2,
+      decimalPlaces,
       formatYLabel = (yLabel: string) => yLabel,
       verticalLabelsHeightPercentage = DEFAULT_X_LABELS_HEIGHT_PERCENTAGE
     } = config;
@@ -204,14 +206,14 @@ class AbstractChart<
 
       if (count === 1) {
         yLabel = `${yAxisLabel}${formatYLabel(
-          data[0].toFixed(decimalPlaces)
+          decimalPlaces ? data[0].toFixed(decimalPlaces) : data[0] + ""
         )}${yAxisSuffix}`;
       } else {
         const label = this.props.fromZero
           ? (this.calcScaler(data) / count) * i + Math.min(...data, 0)
           : (this.calcScaler(data) / count) * i + Math.min(...data);
         yLabel = `${yAxisLabel}${formatYLabel(
-          label.toFixed(decimalPlaces)
+          decimalPlaces ? label.toFixed(decimalPlaces) : label + ""
         )}${yAxisSuffix}`;
       }
 
