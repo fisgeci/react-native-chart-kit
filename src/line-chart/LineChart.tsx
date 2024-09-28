@@ -398,6 +398,10 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
         trueIndex = 0;
       }
 
+      if (trueIndex > data[0].data.length - 1) {
+        trueIndex = data[0].data.length - 1;
+      }
+
       this.label.current.setNativeProps({
         text: scrollableInfoTextDecorator(data[0].data[trueIndex])
       });
