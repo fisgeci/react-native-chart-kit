@@ -4,7 +4,7 @@ import PieChart from "./PieChart";
 import ProgressChart from "./ProgressChart";
 import StackedBarChart from "./StackedBarChart";
 import ContributionGraph from "./contribution-graph";
-import LineChart from "./line-chart";
+import LineChart, { ScrollableDotView } from "./line-chart";
 
 export {
   AbstractChart,
@@ -13,5 +13,6 @@ export {
   PieChart,
   ProgressChart,
   ContributionGraph,
-  StackedBarChart
+  StackedBarChart,
+  ScrollableDotView
 };
