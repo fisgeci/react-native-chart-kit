@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, RefObject } from "react";
 import {
   Animated,
   ScrollView,
@@ -23,6 +23,11 @@ import AbstractChart, {
 } from "../AbstractChart";
 import { ChartData, Dataset } from "../HelperTypes";
 import { LegendItem } from "./LegendItem";
+import {
+  DatapointInfo,
+  ScrollableDotView,
+  ScrollableViewClassDefault
+} from "./ScrollableViewLabel";
 
 let AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -214,17 +219,24 @@ export interface LineChartProps extends AbstractChartProps {
    * The number of horizontal lines
    */
   segments?: number;
+
+  renderScrollableDotView?: <T extends ScrollableDotView>(
+    ref: RefObject<T>
+  ) => ReactNode;
 }
 
 type LineChartState = {
   scrollableDotHorizontalOffset: Animated.Value;
+  dataPointInfo: DatapointInfo | undefined;
 };
 
 class LineChart extends AbstractChart<LineChartProps, LineChartState> {
   label = React.createRef<TextInput>();
+  scrollableView = React.createRef<ScrollableDotView>();
 
   state = {
-    scrollableDotHorizontalOffset: new Animated.Value(0)
+    scrollableDotHorizontalOffset: new Animated.Value(0),
+    dataPointInfo: undefined
   };
 
   getColor = (dataset: Dataset, opacity: number) => {
@@ -349,6 +361,10 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
     return output;
   };
 
+  renderDefaultScrollableDotView = objectRef => (
+    <ScrollableViewClassDefault ref={objectRef} />
+  );
+
   renderScrollableDot = ({
     data,
     width,
@@ -360,13 +376,13 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
     scrollableDotStrokeColor,
     scrollableDotStrokeWidth,
     scrollableDotRadius,
-    scrollableInfoViewStyle,
-    scrollableInfoTextStyle,
-    scrollableInfoTextDecorator = x => `${x}`,
+    labels,
+    renderScrollableDotView = this.renderDefaultScrollableDotView,
     scrollableInfoSize,
     scrollableInfoOffset
   }: AbstractChartConfig & {
     onDataPointClick: LineChartProps["onDataPointClick"];
+    renderScrollableDotView: LineChartProps["renderScrollableDotView"];
     scrollableDotHorizontalOffset: Animated.Value;
   }) => {
     const output = [];
@@ -402,8 +418,11 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
         trueIndex = data[0].data.length - 1;
       }
 
-      this.label.current.setNativeProps({
-        text: scrollableInfoTextDecorator(data[0].data[trueIndex])
+      this.scrollableView.current.setState({
+        dataPoint: {
+          value: data[0].data[trueIndex],
+          time: labels[trueIndex]
+        }
       });
     };
 
@@ -475,18 +494,15 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
         <Animated.View
           key={Math.random()}
           style={[
-            scrollableInfoViewStyle,
             {
               transform: [
                 { translateX: labelTranslateX },
                 { translateY: labelTranslateY }
-              ],
-              width: scrollableInfoSize.width,
-              height: scrollableInfoSize.height
+              ]
             }
           ]}
         >
-          <TextInput
+          <View
             onLayout={() => {
               scrollableDotHorizontalOffset.stopAnimation(value => {
                 setLabelTextByValue(value);
@@ -497,9 +513,9 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
                 setLabelTextByValue(value.value);
               });
             }}
-            style={scrollableInfoTextStyle}
-            ref={this.label}
-          />
+          >
+            <View>{renderScrollableDotView(this.scrollableView)}</View>
+          </View>
         </Animated.View>,
         <AnimatedCircle
           key={Math.random()}
@@ -807,6 +823,7 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
       style = {},
       decorator,
       onDataPointClick,
+      renderScrollableDotView,
       verticalLabelRotation = 0,
       horizontalLabelRotation = 0,
       formatYLabel = yLabel => yLabel,
@@ -925,6 +942,7 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
                 this.renderVerticalLabels({
                   ...config,
                   labels,
+                  xIntervalsToShow: chartConfig.xIntervalsToShow,
                   paddingTop: paddingTop as number,
                   paddingRight: paddingRight as number,
                   formatXLabel
@@ -964,10 +982,12 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
                 this.renderScrollableDot({
                   ...config,
                   ...chartConfig,
+                  labels,
                   data: data.datasets,
                   paddingTop: paddingTop as number,
                   paddingRight: paddingRight as number,
                   onDataPointClick,
+                  renderScrollableDotView,
                   scrollableDotHorizontalOffset
                 })}
             </G>

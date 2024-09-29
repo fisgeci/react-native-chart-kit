@@ -28,6 +28,7 @@ export interface AbstractChartConfig extends ChartConfig {
   labels?: string[];
   horizontalOffset?: number;
   stackedBar?: boolean;
+  xIntervalsToShow?: number;
   verticalLabelRotation?: number;
   formatXLabel?: (xLabel: string) => string;
   verticalLabelsHeightPercentage?: number;
@@ -253,10 +254,12 @@ class AbstractChart<
     stackedBar = false,
     verticalLabelRotation = 0,
     formatXLabel = xLabel => xLabel,
+    xIntervalsToShow,
     verticalLabelsHeightPercentage = DEFAULT_X_LABELS_HEIGHT_PERCENTAGE
   }: Pick<
     AbstractChartConfig,
     | "labels"
+    | "xIntervalsToShow"
     | "width"
     | "height"
     | "paddingRight"
@@ -281,6 +284,10 @@ class AbstractChart<
     }
 
     return labels.map((label, i) => {
+      if (xIntervalsToShow && i % xIntervalsToShow != 0) {
+        return "";
+      }
+
       if (hidePointsAtIndex.includes(i)) {
         return null;
       }
