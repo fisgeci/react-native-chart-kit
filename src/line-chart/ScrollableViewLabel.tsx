@@ -12,6 +12,7 @@ interface ScrollableViewLabelProps {
 
 interface ScrollableViewLabelState {
   dataPoint: DatapointInfo | undefined;
+  scrollPosition: number;
 }
 
 export abstract class ScrollableDotView extends React.Component<
@@ -19,7 +20,8 @@ export abstract class ScrollableDotView extends React.Component<
   ScrollableViewLabelState
 > {
   state = {
-    dataPoint: undefined
+    dataPoint: undefined,
+    scrollPosition: 0
   };
 
   constructor(props) {

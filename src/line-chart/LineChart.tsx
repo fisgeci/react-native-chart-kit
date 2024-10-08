@@ -422,7 +422,8 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
         dataPoint: {
           value: data[0].data[trueIndex],
           time: labels[trueIndex]
-        }
+        },
+        scrollPosition: value
       });
     };
 
@@ -503,7 +504,7 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
           ]}
         >
           <View
-            onLayout={() => {
+            onLayout={event => {
               scrollableDotHorizontalOffset.stopAnimation(value => {
                 setLabelTextByValue(value);
                 scrollableDotHorizontalOffset.removeAllListeners();
@@ -514,7 +515,7 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
               });
             }}
           >
-            <View>{renderScrollableDotView(this.scrollableView)}</View>
+            {renderScrollableDotView(this.scrollableView)}
           </View>
         </Animated.View>,
         <AnimatedCircle
