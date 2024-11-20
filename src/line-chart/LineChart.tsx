@@ -225,7 +225,6 @@ export interface LineChartProps extends AbstractChartProps {
   ) => ReactNode;
 
   paddingLeft: number;
-  paddingRight: number;
 }
 
 type LineChartState = {
