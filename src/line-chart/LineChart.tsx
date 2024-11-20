@@ -223,6 +223,8 @@ export interface LineChartProps extends AbstractChartProps {
   renderScrollableDotView?: <T extends ScrollableDotView>(
     ref: RefObject<T>
   ) => ReactNode;
+
+  paddingLeft: number;
 }
 
 type LineChartState = {
@@ -831,7 +833,8 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
       formatXLabel = xLabel => xLabel,
       segments,
       transparent = false,
-      chartConfig
+      chartConfig,
+      paddingLeft = 64
     } = this.props;
 
     const { scrollableDotHorizontalOffset } = this.state;
@@ -839,11 +842,17 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
     const {
       borderRadius = 0,
       paddingTop = 16,
-      paddingRight = 64,
       margin = 0,
       marginRight = 0,
       paddingBottom = 0
     } = style;
+
+    /* TODO - Rename all the padding right in all functions to padding left
+       Currently if we want to shift the chart to the right we are applying right padding instead of left
+       this is the inverse of what we actually want.
+       So for now we assign a temporary paddingRight variable till we rename the below usages as well
+     */
+    const paddingRight = paddingLeft;
 
     const scrollAnimatedEvent = event => {
       const perData = width / this.numberOfVisibleDots;
