@@ -420,12 +420,20 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
         trueIndex = data[0].data.length - 1;
       }
 
+      const yVal =
+        ((baseHeight -
+          this.calcHeight(data[0].data[trueIndex], datas, height)) /
+          4) *
+          3 +
+        paddingTop;
+
       this.scrollableView.current.setState({
         dataPoint: {
           value: data[0].data[trueIndex],
           time: labels[trueIndex]
         },
-        scrollPosition: value
+        scrollPositionX: value,
+        scrollPositionY: yVal
       });
     };
 
