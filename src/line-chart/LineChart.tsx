@@ -513,22 +513,19 @@ class LineChart extends AbstractChart<LineChartProps, LineChartState> {
             }
           ]}
         >
-          <View
-            onLayout={event => {
-              scrollableDotHorizontalOffset.stopAnimation(value => {
-                setLabelTextByValue(value);
-                scrollableDotHorizontalOffset.removeAllListeners();
-              });
-
-              scrollableDotHorizontalOffset.addListener(value => {
-                setLabelTextByValue(value.value);
-              });
-            }}
-          >
-            {renderScrollableDotView(this.scrollableView)}
-          </View>
+          <View>{renderScrollableDotView(this.scrollableView)}</View>
         </Animated.View>,
         <AnimatedCircle
+          // @ts-ignore
+          onLayout={event => {
+            scrollableDotHorizontalOffset.stopAnimation(function(value) {
+              setLabelTextByValue(value);
+              scrollableDotHorizontalOffset.removeAllListeners();
+            });
+            scrollableDotHorizontalOffset.addListener(function(value) {
+              setLabelTextByValue(value.value);
+            });
+          }}
           key={Math.random()}
           cx={translateX}
           cy={translateY}
